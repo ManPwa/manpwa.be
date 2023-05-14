@@ -1,0 +1,27 @@
+{
+  "name": "manpwa-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ManPwa/manpwa.be.git"
+  },
+  "author": "Long",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ManPwa/manpwa.be/issues"
+  },
+  "homepage": "https://github.com/ManPwa/manpwa.be#readme",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "mongoose": "^7.1.1"
+  }
+}
