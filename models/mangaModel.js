@@ -1,13 +1,8 @@
 const mongoose = require("mongoose");
-const uuid = require("uuid");
+const baseSchema = require("./baseModel");
 
-const mangaSchema = mongoose.Schema(
+const mangaSchema = new mongoose.Schema(
     {
-        _id: { 
-            type: String, 
-            required: [true, "_id is required"],
-            default: uuid.v4() 
-        },
         title: { type: String, default: null },
         description: { type: String, default: null },
         year: { type: Number, default: null },
@@ -16,15 +11,13 @@ const mangaSchema = mongoose.Schema(
         cover_art_url: { type: String, default: null },
         author: { type: String, default: null },
         tags: { type: Array },
-        original_language: { type: String, default: null },
-        _deleted: { type: Date, default: null },
-        _updated: { type: Date, default: Date.now() },
-        _created: { type: Date, default: Date.now() },
-        _updater: { type: String, default: null }
+        original_language: { type: String, default: null }
     }, 
     {
         versionKey: false
     }
 );
+
+mangaSchema.add(baseSchema)
 
 module.exports = mongoose.model("Manga", mangaSchema, "manga");
