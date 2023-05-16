@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use("/api/mangas", require("./routes/mangaRoutes"));
+app.use("/api/manga", require("./routes/mangaRoutes"));
 app.use(errorHandler)
 
 app.listen(port, () => {

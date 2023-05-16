@@ -8,14 +8,12 @@ const getMangas = asyncHandler(async (req, res) => {
     const total_manga = await Manga.count({
         "_deleted": null
     });
-    const mangas = await Manga.find(
-        {
-            "_deleted": null
-        }
-    ).limit(24).skip((req.query.page || 0)*24);
-    response={
+    const manga_list = await Manga.find({
+        "_deleted": null
+    }).limit(24).skip((req.query.page || 0)*24);
+    response = {
         "total_manga": total_manga,
-        "manga_list": mangas || []
+        "manga_list": manga_list || []
     }
     res.status(200).json(response);
 });
@@ -35,20 +33,7 @@ const getManga = asyncHandler(async (req, res) => {
 //@rout POST /api/mangas
 //@access public
 const createManga = asyncHandler(async (req, res) => {
-    const created_manga = await Manga.create(
-        {
-            "_id": uuid.v4(),
-            "title": req.body.title,
-            "description": req.body.description,
-            "year": req.body.year,
-            "status": req.body.status,
-            "demographic": req.body.demographic,
-            "cover_art_url": req.body.cover_art_url,
-            "author": req.body.author,
-            "tags": req.body.tags,
-            "original_language": req.body.original_language
-        }
-    );
+    const created_manga = await Manga.create(req.body);
     res.status(201).json({ 
         message: "Create manga successful", 
         "manga_id": created_manga._id 
@@ -69,7 +54,9 @@ const updateManga = asyncHandler(async (req, res) => {
         req.params.id,
         req.body
     );
-    res.status(202).json({ message: `Updated manga with id ${req.params.id}` });
+    res.status(202).json({ 
+        message: `Updated manga with id ${req.params.id}` 
+    });
 });
 
 //@desc Delete manga
@@ -88,7 +75,9 @@ const deleteManga = asyncHandler(async (req, res) => {
             "_updated": Date.now()
         }
     )
-    res.status(203).json({ message: `Deleted manga with id ${req.params.id}` });
+    res.status(203).json({ 
+        message: `Deleted manga with id ${req.params.id}` 
+    });
 });
 
 module.exports = { getMangas, getManga, createManga, updateManga, deleteManga };

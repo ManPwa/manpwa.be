@@ -1,10 +1,12 @@
 const mongoose = require("mongoose");
+const uuid = require("uuid");
 
 const mangaSchema = mongoose.Schema(
     {
         _id: { 
             type: String, 
-            required: [true, "_id is required"] 
+            required: [true, "_id is required"],
+            default: uuid.v4() 
         },
         title: { type: String, default: null },
         description: { type: String, default: null },
