@@ -6,22 +6,22 @@ const mangaSchema = mongoose.Schema(
             type: String, 
             required: [true, "_id is required"] 
         },
-        title: { type: String },
-        description: { type: String },
-        year: { type: Number },
-        status: { type: String },
-        demographic: { type: String },
-        cover_art_url: { type: String },
-        author: { type: String },
+        title: { type: String, default: null },
+        description: { type: String, default: null },
+        year: { type: Number, default: null },
+        status: { type: String, default: null },
+        demographic: { type: String, default: null },
+        cover_art_url: { type: String, default: null },
+        author: { type: String, default: null },
         tags: { type: Array },
-        original_language: { type: String },
-        _deleted: { type: Date },
-        _updated: { type: Date },
-        _created: { type: Date },
-        _updater: { type: String }
-    },
+        original_language: { type: String, default: null },
+        _deleted: { type: Date, default: null },
+        _updated: { type: Date, default: Date.now() },
+        _created: { type: Date, default: Date.now() },
+        _updater: { type: String, default: null }
+    }, 
     {
-        timestamps: true,
+        versionKey: false
     }
 );
 
