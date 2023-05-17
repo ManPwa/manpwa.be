@@ -14,6 +14,8 @@ const getMangaChapter = asyncHandler(async (req, res) => {
     const chapter_list = await Chapter.find({
         "_deleted": null,
         "manga_id": req.params.manga_id,
+    }).sort({
+        "chapter": -1,
     });
     res.status(200).json(chapter_list);
 });

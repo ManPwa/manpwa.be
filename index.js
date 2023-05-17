@@ -10,7 +10,12 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use("/api/manga", require("./routes/mangaRoutes"), require("./routes/chapterRoutes"));
+app.use(
+    "/api", 
+    require("./routes/mangaRoutes"), 
+    require("./routes/chapterRoutes"),
+    require("./routes/imageRoutes")
+);
 app.use(errorHandler)
 
 app.listen(port, () => {
