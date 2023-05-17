@@ -24,6 +24,7 @@
     "express-async-handler": "^1.2.0",
     "mongoose": "^7.1.1",
     "mongoose-extend-schema": "^1.0.0",
+    "nodemon": "^2.0.22",
     "uuid": "^9.0.0"
   }
 }
