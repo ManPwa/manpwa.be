@@ -16,6 +16,7 @@ app.use(
     require("./routes/chapterRoutes"),
     require("./routes/imageRoutes")
 );
+app.use("/api/user", require("./routes/userRoutes"));
 app.use(errorHandler)
 
 app.listen(port, () => {
