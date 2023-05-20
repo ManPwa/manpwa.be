@@ -66,7 +66,6 @@ const loginUser = asyncHandler(async (req, res) => {
             process.env.ACCESS_TOKEN_SECRET
         );
         res.status(200).json({
-            "user_id": user._id,
             "access_token": access_token
         });
     } else {

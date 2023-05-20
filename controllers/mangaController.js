@@ -49,6 +49,10 @@ const updateManga = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Manga not found")
     }
+    if (req.file) {
+        cover_art_url = req.file.path;
+    };
+    req.body.cover_art_url = cover_art_url;
     req.body._updated = Date.now();
     await Manga.findByIdAndUpdate(
         req.params.id,
