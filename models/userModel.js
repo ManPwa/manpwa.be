@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
         },
         date_of_birth: { type: Date, default: null },
         avatar_url: { type: String, default: null },
+        is_admin: { type: Boolean, default: null }
     },
     {
         versionKey: false

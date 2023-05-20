@@ -5,36 +5,31 @@ const errorHandler = (err, req, res, next) => {
         case constant.VALIDATION_ERROR:
             res.json({ 
                 title: "Validation Failed",
-                message: err.message, 
-                stackTrace: err.stack 
+                message: err.message
             });
             break;
         case constant.NOT_FOUND:
             res.json({
                 title: "Not Found",
-                message: err.message,
-                stackTrace: err.stack
+                message: err.message
             });
             break;
         case constant.FORBIDDEN:
             res.json({
                 title: "Forbidden",
-                message: err.message,
-                stackTrace: err.stack
+                message: err.message
             });
             break;
         case constant.UNAUTHORIZED:
             res.json({
                 title: "Unauthorized",
-                message: err.message,
-                stackTrace: err.stack
+                message: err.message
             });
             break;
         case constant.SERVER_ERROR:
             res.json({
                 title: "Server error",
-                message: err.message,
-                stackTrace: err.stack
+                message: err.message
             });
             break;
         default:

@@ -25,6 +25,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
     req.body.password = hashedPassword;
+    req.body.is_admin = false;
     const user = await User.create(req.body);
     if (user) {
         res.status(201).json(
@@ -54,9 +55,12 @@ const loginUser = asyncHandler(async (req, res) => {
         const access_token = jwt.sign(
             {
                 user: {
+                    _id: user._id,
                     username: user.username,
                     email: user.email,
-                    _id: user._id
+                    is_admin: user.is_admin,
+                    date_of_birth: user.date_of_birth,
+                    avatar_url: user.avatar_url
                 },
             },
             process.env.ACCESS_TOKEN_SECRET
@@ -76,9 +80,7 @@ const loginUser = asyncHandler(async (req, res) => {
 //@rout GET /api/user/current
 //@access public
 const currentUser = asyncHandler(async (req, res) => {
-    res.json(
-        { message: "current" }
-    );
+    res.json(req.user);
 });
 
 module.exports = { registerUser, loginUser, currentUser }
