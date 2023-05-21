@@ -19,5 +19,6 @@ const mangaSchema = new mongoose.Schema(
 );
 
 mangaSchema.add(baseSchema)
+mangaSchema.index({ title: 'text' });
 
 module.exports = mongoose.model("Manga", mangaSchema, "manga");

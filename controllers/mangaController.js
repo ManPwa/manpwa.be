@@ -8,12 +8,15 @@ const uuid = require("uuid");
 //@rout GET /api/manga
 //@access public
 const getMangas = asyncHandler(async (req, res) => {
+    console.log(req.query.title);
     const total_manga = await Manga.count({
         "_deleted": null
     });
     const manga_list = await Manga.find({
         "_deleted": null
-    }).limit(24).skip((req.query.page || 0)*24);
+    }).limit(24)
+        .skip((req.query.page || 0)*24)
+        .find({ $text: { $search: req.query.title } });
     response = {
         "total_manga": total_manga,
         "manga_list": manga_list || []
