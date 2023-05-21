@@ -60,6 +60,7 @@ const getCommentManga = asyncHandler(async (req, res) => {
                 "_created": 1,
                 "user.username": 1,
                 "user.avatar_url": 1,
+                "user.is_admin": 1,
             }
         },
         { 
