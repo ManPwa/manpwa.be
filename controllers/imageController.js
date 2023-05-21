@@ -6,7 +6,10 @@ const uuid = require("uuid");
 //@rout GET /api/chapter/:chapter_id/image
 //@access public
 const getChapterImage = asyncHandler(async (req, res) => {
-    const chapter = await Chapter.findById(req.params.chapter_id);
+    const chapter = await Chapter.findOne({
+        "_id": req.params.chapter_id,
+        "_deleted": null
+    });
     if (!chapter) {
         res.status(404);
         throw new Error("Chapter not found")

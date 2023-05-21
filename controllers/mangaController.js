@@ -50,7 +50,10 @@ const createManga = asyncHandler(async (req, res) => {
 //@rout PUT /api/mangas/:id
 //@access private
 const updateManga = asyncHandler(async (req, res) => {
-    const manga = await Manga.findById(req.params.id);
+    const manga = await Manga.findOne({
+        "_id": req.params.id,
+        "_deleted": null
+    });
     if (!manga) {
         res.status(404);
         throw new Error("Manga not found")
@@ -73,7 +76,10 @@ const updateManga = asyncHandler(async (req, res) => {
 //@rout Delete /api/mangas/:id
 //@access private
 const deleteManga = asyncHandler(async (req, res) => {
-    const manga = await Manga.findById(req.params.id);
+    const manga = await Manga.findOne({
+        "_id": req.params.id,
+        "_deleted": null
+    });
     if (!manga) {
         res.status(404);
         throw new Error("Manga not found")

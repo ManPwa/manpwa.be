@@ -7,7 +7,10 @@ const Manga = require("../models/mangaModel");
 //@rout POST /api/manga/:id/comment
 //@access private
 const commentManga = asyncHandler(async (req, res) => {
-    const manga = await Manga.findById(req.params.id);
+    const manga = await Manga.findOne({
+        "_id": req.params.id,
+        "_deleted": null
+    });
     if (!manga) {
         res.status(404);
         throw new Error("Manga not found")
@@ -26,15 +29,46 @@ const commentManga = asyncHandler(async (req, res) => {
 //@rout GET /api/manga/:id/comment
 //@access private
 const getCommentManga = asyncHandler(async (req, res) => {
-    const manga = await Manga.findById(req.params.id);
+    const manga = await Manga.findOne({
+        "_id": req.params.id,
+        "_deleted": null
+    });
     if (!manga) {
         res.status(404);
         throw new Error("Manga not found")
     }
-    const comment_list = await Comment.find({
-        "_deleted": null,
-        "manga_id": req.params.id
-    });
+    const comment_list = await Comment.aggregate([
+        {
+            $lookup: {
+                from: "user",
+                localField: "user_id",
+                foreignField: "_id",
+                as: "user"
+            }
+        },
+        {
+            "$unwind": "$user"
+        },
+        {
+            "$project": {
+                "_id": 1,
+                "user_id": 1,
+                "manga_id": 1,
+                "content": 1,
+                "_deleted": 1,
+                "_updated": 1,
+                "_created": 1,
+                "user.username": 1,
+                "user.avatar_url": 1,
+            }
+        },
+        { 
+            "$match": { 
+                "_deleted": null,
+                "manga_id": req.params.id 
+            } 
+        },
+    ]);
     res.status(200).json(comment_list || []);
 });
 
