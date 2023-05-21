@@ -9,11 +9,19 @@ const getMangas = asyncHandler(async (req, res) => {
     const total_manga = await Manga.count({
         "_deleted": null
     });
-    const manga_list = await Manga.find({
-        "_deleted": null
-    }).limit(24)
-        .skip((req.query.page || 0)*24)
-        .find({ $text: { $search: req.query.title } });
+    const mangalist = null;
+    if (req.query.title) {
+        manga_list = await Manga.find({
+            "_deleted": null
+        }).limit(24)
+            .skip((req.query.page || 0)*24)
+            .find({ $text: { $search: req.query.title } });
+    } else {
+        manga_list = await Manga.find({
+            "_deleted": null
+        }).limit(24)
+            .skip((req.query.page || 0) * 24);
+    }
     response = {
         "total_manga": total_manga,
         "manga_list": manga_list || []
