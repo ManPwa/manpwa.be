@@ -10,9 +10,5 @@ router.route("/manga/:id")
     .get(getManga)
     .put(validateAdminToken, fileUploader.single('file'), updateManga)
     .delete(validateAdminToken, deleteManga);
-  
-router.route("/manga/:id/follow").post(validateToken, followManga);
-
-router.route("/manga/follow").post(validateToken, getFollowingManga);
 
 module.exports = router;

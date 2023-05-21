@@ -14,7 +14,8 @@ app.use(
     "/api", 
     require("./routes/mangaRoutes"), 
     require("./routes/chapterRoutes"),
-    require("./routes/imageRoutes")
+    require("./routes/imageRoutes"),
+    require("./routes/followRoutes")
 );
 app.use("/api/user", require("./routes/userRoutes"));
 app.use(errorHandler)
