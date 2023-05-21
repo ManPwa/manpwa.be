@@ -1,8 +1,11 @@
 const asyncHandler = require("express-async-handler");
+const Follow = require("../models/followModel")
 const Manga = require("../models/mangaModel");
 const uuid = require("uuid");
-//@desc Get all mangas
-//@rout GET /api/mangas
+
+
+//@desc Get all manga
+//@rout GET /api/manga
 //@access public
 const getMangas = asyncHandler(async (req, res) => {
     const total_manga = await Manga.count({
@@ -18,8 +21,9 @@ const getMangas = asyncHandler(async (req, res) => {
     res.status(200).json(response);
 });
 
-//@desc Get all mangas
-//@rout GET /api/mangas
+
+//@desc Get all manga
+//@rout GET /api/manga
 //@access public
 const getManga = asyncHandler(async (req, res) => {
     const manga = await Manga.findOne({
@@ -29,9 +33,10 @@ const getManga = asyncHandler(async (req, res) => {
     res.status(200).json(manga || {});
 });
 
+
 //@desc Create new manga
 //@rout POST /api/mangas
-//@access public
+//@access private
 const createManga = asyncHandler(async (req, res) => {
     const created_manga = await Manga.create(req.body);
     res.status(201).json({ 
@@ -40,9 +45,10 @@ const createManga = asyncHandler(async (req, res) => {
     });
 });
 
+
 //@desc Update manga
 //@rout PUT /api/mangas/:id
-//@access public
+//@access private
 const updateManga = asyncHandler(async (req, res) => {
     const manga = await Manga.findById(req.params.id);
     if (!manga) {
@@ -65,7 +71,7 @@ const updateManga = asyncHandler(async (req, res) => {
 
 //@desc Delete manga
 //@rout Delete /api/mangas/:id
-//@access public
+//@access private
 const deleteManga = asyncHandler(async (req, res) => {
     const manga = await Manga.findById(req.params.id);
     if (!manga) {
@@ -84,4 +90,59 @@ const deleteManga = asyncHandler(async (req, res) => {
     });
 });
 
-module.exports = { getMangas, getManga, createManga, updateManga, deleteManga };
+
+//@desc Follow manga
+//@rout POST /api/manga
+//@access private
+const followManga = asyncHandler(async (req, res) => {
+    const manga = await Manga.findOne({
+        "manga_id": req.params.id,
+        "_deleted": null
+    });
+    if (!manga) {
+        res.status(404);
+        throw new Error("Manga not found")
+    }
+    const following_manga = await Follow.findOne({
+        "manga_id": req.params.id,
+        "user_id": req.user._id,
+        "_deleted": null
+    });
+    if (following_manga) {
+        await Follow.findByIdAndUpdate(
+            following_manga._id,
+            {
+                "is_following": !following_manga.is_following,
+                "_updated": Date.now()
+            }
+        );
+    } else {
+        const follow = await Follow.create({
+            "manga_id": req.params.id,
+            "user_id": req.user._id
+        });
+    }
+    res.status(201).json({
+        message: "OK"
+    });
+});
+
+//@desc Get following manga
+//@rout GET /api/manga/follow
+//@access private
+const getFollowingManga = asyncHandler(async (req, res) => {
+    const following_manga = await Follow.find({
+        "user_id": req.user._id,
+        "_deleted": null
+    });
+    list_manga_id = [];
+    for (var f of following_manga) {
+        list_manga_id.push(f.manga_id);
+    }
+    const manga_list = await Manga.find({
+        "_id": { $in: list_manga_id },
+    });
+    res.status(200).json(manga_list || {});
+});
+
+module.exports = { getMangas, getManga, createManga, updateManga, deleteManga, followManga, getFollowingManga };
