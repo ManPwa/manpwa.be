@@ -68,8 +68,8 @@ const updateManga = asyncHandler(async (req, res) => {
     }
     if (req.file) {
         cover_art_url = req.file.path;
+        req.body.cover_art_url = cover_art_url;
     };
-    req.body.cover_art_url = cover_art_url;
     req.body._updated = Date.now();
     await Manga.findByIdAndUpdate(
         req.params.id,

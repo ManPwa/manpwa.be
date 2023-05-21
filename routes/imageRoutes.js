@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-
-const { getChapterImage } = require("../controllers/imageController");
+const { validateAdminToken } = require("../middleware/validateTokenHandler");
+const { getChapterImage, createChapterImage, updateChapterImage, deleteChapterImage } = require("../controllers/imageController");
+const fileUploader = require('../config/cloudinary.config');
 
 // router.route("/");
 
@@ -9,6 +10,12 @@ const { getChapterImage } = require("../controllers/imageController");
 
 // router.route("/:manga_id/chapter").get(getMangaChapter).post(createChapter);
 
-router.route("/chapter/:chapter_id/image").get(getChapterImage);
+router.route("/chapter/:id/image")
+    .get(getChapterImage)
+    .post(validateAdminToken, fileUploader.single('file'), createChapterImage);
+
+router.route("/image/:id")
+    .put(validateAdminToken, fileUploader.single('file'), updateChapterImage)
+    .delete(validateAdminToken, deleteChapterImage);
 
 module.exports = router;

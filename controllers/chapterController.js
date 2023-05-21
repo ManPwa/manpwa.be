@@ -14,14 +14,12 @@ const getMangaChapter = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Manga not found")
     }
-    console.log(req.params.manga_id);
     const chapter_list = await Chapter.find({
         "_deleted": null,
         "manga_id": req.params.id,
     }).sort({
         "chapter": -1,
     });
-    console.log(chapter_list);
     res.status(200).json(chapter_list);
 });
 
@@ -38,6 +36,7 @@ const createChapter = asyncHandler(async (req, res) => {
     });
 });
 
+
 //@desc Update chapter
 //@rout PUT /api/chapter/:id
 //@access public
@@ -46,7 +45,10 @@ const updateChapter = asyncHandler(async (req, res) => {
         res.status(403);
         throw new Error("Cannot update manga id");
     }
-    const chapter = await Chapter.findById(req.params.id);
+    const chapter = await Chapter.findOne({
+        "_id": req.params.id,
+        "_deleted": null,
+    });
     if (!chapter) {
         res.status(404);
         throw new Error("Chapter not found");
@@ -61,11 +63,15 @@ const updateChapter = asyncHandler(async (req, res) => {
     });
 });
 
+
 //@desc Delete chapter
 //@rout Delete /api/chapter/:id
 //@access public
 const deleteChapter = asyncHandler(async (req, res) => {
-    const chapter = await Chapter.findById(req.params.id);
+    const chapter = await Chapter.findOne({
+        "_id": req.params.id,
+        "_deleted": null,
+    });
     if (!chapter) {
         res.status(404);
         throw new Error("Chapter not found")
