@@ -17,8 +17,9 @@ app.use(
     require("./routes/imageRoutes"),
     require("./routes/followRoutes"),
     require("./routes/commentRoutes"),
+    require("./routes/userRoutes"),
+    require("./routes/ratingRoutes")
 );
-app.use("/api/user", require("./routes/userRoutes"));
 app.use(errorHandler)
 
 app.listen(port, () => {
