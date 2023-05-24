@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
+// const mangaSchema = require("./mangaModel");
 const baseSchema = require("./baseModel");
 
-const mangaSchema = new mongoose.Schema(
+const viewMangaSchema = new mongoose.Schema(
     {
         title: { type: String, default: null },
         description: { type: String, default: null },
@@ -11,13 +12,16 @@ const mangaSchema = new mongoose.Schema(
         cover_art_url: { type: String, default: null },
         author: { type: String, default: null },
         tags: { type: Array },
-        original_language: { type: String, default: null }
-    }, 
+        original_language: { type: String, default: null },
+        following: { type: Number, default: null },
+        average_rating: { type: Number, default: null },
+    },
     {
         versionKey: false
     }
 );
 
-mangaSchema.add(baseSchema)
+viewMangaSchema.add(baseSchema)
+viewMangaSchema.index({ title: 'text' });
 
-module.exports = mongoose.model("Manga", mangaSchema, "manga");
+module.exports = mongoose.model("MangaView", viewMangaSchema, "view--manga");

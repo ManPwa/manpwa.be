@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Manga = require("../models/mangaModel");
-
+const MangaView = require("../models/viewMangaModel");
 
 //@desc Get all manga
 //@rout GET /api/manga
@@ -9,18 +9,24 @@ const getMangas = asyncHandler(async (req, res) => {
     const total_manga = await Manga.count({
         "_deleted": null
     });
-    const mangalist = null;
     if (req.query.title) {
         manga_list = await Manga.find({
             "_deleted": null
         }).limit(24)
-            .skip((req.query.page || 0)*24)
+            .skip((req.query.page || 0) * 24)
             .find({ $text: { $search: req.query.title } });
     } else {
-        manga_list = await Manga.find({
-            "_deleted": null
-        }).limit(24)
-            .skip((req.query.page || 0) * 24);
+        manga_list = await MangaView.aggregate([
+            {
+                "$match": {
+                    "_deleted": null,
+                    "manga_id": req.params.id
+                } 
+            },
+            { "$sort": JSON.parse(req.query.sort) },
+            { "$skip": (req.query.page || 0) * 24 },
+            { "$limit": 24 }
+        ]);
     }
     response = {
         "total_manga": total_manga,
