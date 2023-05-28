@@ -16,6 +16,12 @@ const getMangas = asyncHandler(async (req, res) => {
             .skip((req.query.page || 0) * 24)
             .find({ $text: { $search: req.query.title } });
     } else {
+        try {
+        if (req.query.sort) {
+            sort = JSON.parse(req.query.sort)
+        } else {
+            sort = {"_created": 1}
+        }
         manga_list = await MangaView.aggregate([
             {
                 "$match": {
@@ -23,10 +29,13 @@ const getMangas = asyncHandler(async (req, res) => {
                     "manga_id": req.params.id
                 } 
             },
-            { "$sort": JSON.parse(req.query.sort) },
-            { "$skip": (req.query.page || 0) * 24 },
-            { "$limit": 24 }
+            { "$sort": sort },
+            { "$skip": (req.query.page || 0) * (parseInt(req.query.limit) || 24) },
+            { "$limit": parseInt(req.query.limit) || 24 }
         ]);
+    } catch (e) {
+        console.log(e);
+    }
     }
     response = {
         "total_manga": total_manga,
