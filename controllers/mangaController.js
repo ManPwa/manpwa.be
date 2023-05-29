@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Manga = require("../models/mangaModel");
 const MangaView = require("../models/viewMangaModel");
+const Chapter = require("../models/chapterModel");
 
 //@desc Get all manga
 //@rout GET /api/manga
@@ -17,25 +18,25 @@ const getMangas = asyncHandler(async (req, res) => {
             .find({ $text: { $search: req.query.title } });
     } else {
         try {
-        if (req.query.sort) {
-            sort = JSON.parse(req.query.sort)
-        } else {
-            sort = {"_created": 1}
+            if (req.query.sort) {
+                sort = JSON.parse(req.query.sort)
+            } else {
+                sort = {"_created": 1}
+            }
+            manga_list = await MangaView.aggregate([
+                {
+                    "$match": {
+                        "_deleted": null,
+                        "manga_id": req.params.id
+                    } 
+                },
+                { "$sort": sort },
+                { "$skip": (req.query.page || 0) * (parseInt(req.query.limit) || 24) },
+                { "$limit": parseInt(req.query.limit) || 24 }
+            ]);
+        } catch (e) {
+            console.log(e);
         }
-        manga_list = await MangaView.aggregate([
-            {
-                "$match": {
-                    "_deleted": null,
-                    "manga_id": req.params.id
-                } 
-            },
-            { "$sort": sort },
-            { "$skip": (req.query.page || 0) * (parseInt(req.query.limit) || 24) },
-            { "$limit": parseInt(req.query.limit) || 24 }
-        ]);
-    } catch (e) {
-        console.log(e);
-    }
     }
     response = {
         "total_manga": total_manga,

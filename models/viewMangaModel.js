@@ -15,6 +15,7 @@ const viewMangaSchema = new mongoose.Schema(
         original_language: { type: String, default: null },
         following: { type: Number, default: null },
         average_rating: { type: Number, default: null },
+        latest_chapter: { type: Number, default: null },
     },
     {
         versionKey: false
