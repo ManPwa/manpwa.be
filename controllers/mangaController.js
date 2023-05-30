@@ -50,7 +50,7 @@ const getMangas = asyncHandler(async (req, res) => {
 //@rout GET /api/manga
 //@access public
 const getManga = asyncHandler(async (req, res) => {
-    const manga = await Manga.findOne({
+    const manga = await MangaView.findOne({
         "_id": req.params.id,
         "_deleted": null
     });
