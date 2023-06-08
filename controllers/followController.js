@@ -45,14 +45,37 @@ const followManga = asyncHandler(async (req, res) => {
 const getFollowingManga = asyncHandler(async (req, res) => {
     const following_manga = await Follow.find({
         "user_id": req.user._id,
+        "is_following": true,
         "_deleted": null
     });
     list_manga_id = following_manga.map(f => f.manga_id);
-    const manga_list = await Manga.find({
+    const total_manga = await Manga.count({
         "_id": { $in: list_manga_id },
         "_deleted": null
     });
-    res.status(200).json(manga_list || {});
+    const manga_list = await Manga.find({
+        "_id": { $in: list_manga_id },
+        "_deleted": null
+    }).limit(24).sort({
+        "_updated": -1,
+    });
+    response = {
+        "total_manga": total_manga,
+        "manga_list": manga_list || []
+    }
+    res.status(200).json(response || {});
 });
 
-module.exports = { followManga, getFollowingManga };
+//@desc Get following
+//@rout GET /api/manga/:manga_id/follow
+//@access private
+const getFollow = asyncHandler(async (req, res) => {
+    const follow = await Follow.findOne({
+        "manga_id": req.params.id,
+        "user_id": req.user._id,
+        "_deleted": null
+    });
+    res.status(200).json(follow);
+});
+
+module.exports = { followManga, getFollowingManga, getFollow };
