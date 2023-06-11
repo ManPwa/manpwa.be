@@ -52,7 +52,7 @@ const getRatingManga = asyncHandler(async (req, res) => {
         "user_id": req.user._id,
         "manga_id": req.params.id
     });
-    res.status(200).json(rating || []);
+    res.status(200).json(rating);
 });
 
 module.exports = { ratingManga, getRatingManga };
