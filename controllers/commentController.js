@@ -69,6 +69,11 @@ const getCommentManga = asyncHandler(async (req, res) => {
                 "manga_id": req.params.id 
             } 
         },
+        {
+            "$sort": {
+                "_created": -1
+            }
+        }
     ]);
     res.status(200).json(comment_list || []);
 });

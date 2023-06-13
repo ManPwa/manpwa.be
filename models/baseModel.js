@@ -7,8 +7,8 @@ const baseSchema = {
             default: () => uuid.v4()
         },
         _deleted: { type: Date, default: null },
-        _updated: { type: Date, default: Date.now() },
-        _created: { type: Date, default: Date.now() },
+        _updated: { type: Date, default: () => Date.now() },
+        _created: { type: Date, default: () => Date.now() },
         _updater: { type: String, default: null }
     };
 
