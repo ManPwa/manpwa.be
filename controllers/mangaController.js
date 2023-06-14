@@ -10,41 +10,71 @@ const getMangas = asyncHandler(async (req, res) => {
     const total_manga = await Manga.count({
         "_deleted": null
     });
-    if (req.query.title) {
-        manga_list = await Manga.find({
-            "_deleted": null
-        }).limit(24)
-            .skip((req.query.page || 0) * 24)
-            .find({ $text: { $search: req.query.title } });
-    } else {
-        try {
-            if (req.query.sort) {
-                sort = JSON.parse(req.query.sort)
-            } else {
-                sort = {"_created": 1}
+    if (req.query.range) {
+        range = JSON.parse(req.query.range)
+        manga_list = await Manga.aggregate([
+            {
+                "$match": {
+                    "_deleted": null
+                }
+            },
+            { "$sort": { "_created": -1 } },
+            { "$skip": range[0] },
+            { "$limit": (range[1] - range[0] + 1) },
+            { 
+                "$addFields": {
+                    "id": "$_id"
+                }
             }
-            manga_list = await MangaView.aggregate([
-                {
-                    "$match": {
-                        "_deleted": null,
-                        "manga_id": req.params.id
-                    } 
-                },
-                { "$sort": sort },
-                { "$skip": (req.query.page || 0) * (parseInt(req.query.limit) || 24) },
-                { "$limit": parseInt(req.query.limit) || 24 }
-            ]);
-        } catch (e) {
-            console.log(e);
+        ]);
+        
+        response = manga_list;
+    } else {
+        if (req.query.title) {
+            manga_list = await Manga.find({
+                "_deleted": null
+            }).limit(24)
+                .skip((req.query.page || 0) * 24)
+                .find({ $text: { $search: req.query.title } });
+        } else {
+            try {
+                if (req.query.sort) {
+                    sort = JSON.parse(req.query.sort)
+                } else {
+                    sort = {"_created": 1}
+                }
+                manga_list = await MangaView.aggregate([
+                    {
+                        "$match": {
+                            "_deleted": null
+                        } 
+                    },
+                    { "$sort": sort },
+                    { "$skip": (req.query.page || 0) * (parseInt(req.query.limit) || 24) },
+                    { "$limit": parseInt(req.query.limit) || 24 }
+                ]);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        response = {
+            "total_manga": total_manga,
+            "manga_list": manga_list || []
         }
     }
-    response = {
-        "total_manga": total_manga,
-        "manga_list": manga_list || []
-    }
-    res.status(200).json(response);
+    res.setHeader('Content-Range', `posts : 0-9/${total_manga}`).status(200).json(response);
 });
 
+
+//@desc Get all manga
+//@rout GET /api/manga
+//@access public
+const getMangasWithRange = asyncHandler(async (req, res) => {
+    manga_list = await Manga.find({
+        "_deleted": null
+    }).sort({"_created": -1});
+    res.status(200).json(manga_list || []);
+});
 
 //@desc Get all manga
 //@rout GET /api/manga
@@ -54,7 +84,7 @@ const getManga = asyncHandler(async (req, res) => {
         "_id": req.params.id,
         "_deleted": null
     });
-    res.status(200).json(manga || {});
+    res.status(200).json(manga || {}).header({"Content-Range": "0-20/20"});
 });
 
 
@@ -121,4 +151,4 @@ const deleteManga = asyncHandler(async (req, res) => {
 });
 
 
-module.exports = { getMangas, getManga, createManga, updateManga, deleteManga };
+module.exports = { getMangas, getManga, createManga, updateManga, deleteManga, getMangasWithRange };
