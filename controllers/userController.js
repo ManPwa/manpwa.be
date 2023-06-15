@@ -3,6 +3,20 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+//@desc Get users
+//@rout GET /api/user
+//@access private
+const getUser = asyncHandler(async (req, res) => {
+    const total_user = await User.count({
+        "_deleted": null
+    });
+    const user = await User.find({
+        "_deleted": null
+    });
+    res.setHeader('Content-Range', `posts : 0-9/${total_user}`).status(200).json(user);
+});
+
+
 //@desc Register a user
 //@rout POST /api/user/register
 //@access public
@@ -82,4 +96,4 @@ const currentUser = asyncHandler(async (req, res) => {
     res.json(req.user);
 });
 
-module.exports = { registerUser, loginUser, currentUser }
+module.exports = { registerUser, loginUser, currentUser, getUser }
