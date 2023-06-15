@@ -62,7 +62,7 @@ const getMangas = asyncHandler(async (req, res) => {
             "manga_list": manga_list || []
         }
     }
-    res.setHeader('Content-Range', `posts : 0-9/${total_manga}`).status(200).json(response);
+    res.setHeader('Content-Range', `posts : ${range[0]}-${range[1]}/${total_manga}`).status(200).json(response);
 });
 
 
