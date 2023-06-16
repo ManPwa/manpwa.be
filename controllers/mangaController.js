@@ -11,23 +11,30 @@ const getMangas = asyncHandler(async (req, res) => {
         "_deleted": null
     });
     if (req.query.range) {
-        range = JSON.parse(req.query.range)
-        manga_list = await Manga.aggregate([
-            {
-                "$match": {
-                    "_deleted": null
-                }
-            },
-            { "$sort": { "_created": -1 } },
-            { "$skip": range[0] },
-            { "$limit": (range[1] - range[0] + 1) },
-            { 
-                "$addFields": {
-                    "id": "$_id"
-                }
+        try {
+            range = JSON.parse(req.query.range)
+            match = {
+                "_deleted": null,
+            };
+            if (req.query.title) {
+                match["$text"] = { $search: req.query.title.replace('\"', '') } 
             }
-        ]);
-        
+            manga_list = await Manga.aggregate([
+                {
+                    "$match": match
+                },
+                { "$sort": { "_created": -1 } },
+                { "$skip": range[0] },
+                { "$limit": (range[1] - range[0] + 1) },
+                {
+                    "$addFields": {
+                        "id": "$_id"
+                    }
+                }
+            ]);
+        } catch (e) {
+            console.log(e);
+        }
         response = manga_list;
     } else {
         if (req.query.title) {

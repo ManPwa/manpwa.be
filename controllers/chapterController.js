@@ -14,13 +14,18 @@ const getMangaChapter = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Manga not found")
     }
+    range = JSON.parse(req.query.range)
+    const total_chapter = await Chapter.count({
+        "_deleted": null,
+        "manga_id": req.params.id,
+    });
     const chapter_list = await Chapter.find({
         "_deleted": null,
         "manga_id": req.params.id,
     }).sort({
         "chapter": -1,
     });
-    res.status(200).json(chapter_list);
+    res.setHeader('Content-Range', `posts : ${range[0]}-${range[1]}/${total_chapter}`).status(200).json(chapter_list);
 });
 
 
