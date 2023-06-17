@@ -15,13 +15,30 @@ const getChapterImage = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Chapter not found")
     }
-    const image_list = await Image.find({
+    aggregate = [
+        {
+            "$match": {
+                "_deleted": null,
+                "chapter_id": req.params.id,
+            },
+        },
+        {
+            "$sort": {
+                "page": 1,
+            }
+        }
+    ];
+    if (req.query.range) {
+        range = JSON.parse(req.query.range)
+        aggregate.push({ "$skip": range[0] });
+        aggregate.push({ "$limit": (range[1] - range[0] + 1) });
+    }
+    const image_list = await Image.aggregate(aggregate);
+    const total_image = await Image.count({
         "_deleted": null,
         "chapter_id": req.params.id,
-    }).sort({
-        "page": 1,
     });
-    res.status(200).json(image_list);
+    res.setHeader('Content-Range', `posts : 0-100/${total_image}`).status(200).json(image_list);
 });
 
 
