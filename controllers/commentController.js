@@ -37,7 +37,7 @@ const getCommentManga = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Manga not found")
     }
-    const comment_list = await Comment.aggregate([
+    aggregate = [
         {
             $lookup: {
                 from: "user",
@@ -74,8 +74,14 @@ const getCommentManga = asyncHandler(async (req, res) => {
                 "_created": -1
             }
         }
-    ]);
-    res.status(200).json(comment_list || []);
+    ];
+    if (req.query.range) {
+        range = JSON.parse(req.query.range)
+        aggregate.push({ "$skip": range[0] });
+        aggregate.push({ "$limit": (range[1] - range[0] + 1) });
+    }
+    const comment_list = await Comment.aggregate(aggregate);
+    res.setHeader('Content-Range', `posts :0-9/${comment_list.length}`).status(200).json(comment_list);
 });
 
 //@desc Delete comment

@@ -23,7 +23,7 @@ const getMangas = asyncHandler(async (req, res) => {
                 {
                     "$match": match
                 },
-                { "$sort": { "_created": -1 } },
+                { "$sort": { "_updated": -1 } },
                 { "$skip": range[0] },
                 { "$limit": (range[1] - range[0] + 1) },
                 {

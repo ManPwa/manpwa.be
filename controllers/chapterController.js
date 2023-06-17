@@ -14,18 +14,30 @@ const getMangaChapter = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Manga not found")
     }
-    range = JSON.parse(req.query.range)
     const total_chapter = await Chapter.count({
         "_deleted": null,
         "manga_id": req.params.id,
     });
-    const chapter_list = await Chapter.find({
-        "_deleted": null,
-        "manga_id": req.params.id,
-    }).sort({
-        "chapter": -1,
-    });
-    res.setHeader('Content-Range', `posts : ${range[0]}-${range[1]}/${total_chapter}`).status(200).json(chapter_list);
+    aggregate = [
+        {
+            "$match": {
+                "_deleted": null,
+                "manga_id": req.params.id,
+            },
+        },
+        {
+            "$sort": {
+                "chapter": -1,
+            }
+        }
+    ];
+    if (req.query.range) {
+        range = JSON.parse(req.query.range)
+        aggregate.push({ "$skip": range[0] });
+        aggregate.push({ "$limit": (range[1] - range[0] + 1) });
+    }
+    const chapter_list = await Chapter.aggregate(aggregate);
+    res.setHeader('Content-Range', `posts : 0-9/${total_chapter}`).status(200).json(chapter_list);
 });
 
 
@@ -35,9 +47,9 @@ const getMangaChapter = asyncHandler(async (req, res) => {
 const createChapter = asyncHandler(async (req, res) => {
     req.body.manga_id = req.params.id;
     const created_chapter = await Chapter.create(req.body);
-    res.status(201).json({ 
-        message: "Create chapter successful", 
-        "chapter_id": created_chapter._id 
+    res.status(201).json({
+        message: "Create chapter successful",
+        "chapter_id": created_chapter._id
     });
 });
 
@@ -63,8 +75,8 @@ const updateChapter = asyncHandler(async (req, res) => {
         req.params.id,
         req.body
     );
-    res.status(202).json({ 
-        message: `Updated chapter with id ${req.params.id}` 
+    res.status(202).json({
+        message: `Updated chapter with id ${req.params.id}`
     });
 });
 
@@ -83,13 +95,13 @@ const deleteChapter = asyncHandler(async (req, res) => {
     }
     await Chapter.findByIdAndUpdate(
         req.params.id,
-        { 
+        {
             "_deleted": Date.now(),
             "_updated": Date.now()
         }
     )
-    res.status(203).json({ 
-        message: `Deleted chapter with id ${req.params.id}` 
+    res.status(203).json({
+        message: `Deleted chapter with id ${req.params.id}`
     });
 });
 
