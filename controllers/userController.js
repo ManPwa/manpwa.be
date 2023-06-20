@@ -99,4 +99,29 @@ const currentUser = asyncHandler(async (req, res) => {
     res.json(req.user);
 });
 
-module.exports = { registerUser, loginUser, currentUser, getUser }
+
+//@desc Delete user
+//@rout Delete /api/user/:id
+//@access private
+const deleteUser = asyncHandler(async (req, res) => {
+    const user = await User.findOne({
+        "_id": req.params.id,
+        "_deleted": null
+    });
+    if (!user) {
+        res.status(404);
+        throw new Error("User not found");
+    }
+    await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            "_deleted": Date.now(),
+            "_updated": Date.now()
+        }
+    )
+    res.status(203).json({
+        message: `Deleted user with id ${req.params.id}`
+    });
+});
+
+module.exports = { registerUser, loginUser, currentUser, getUser, deleteUser }

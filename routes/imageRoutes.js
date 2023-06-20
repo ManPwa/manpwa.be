@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { validateAdminToken } = require("../middleware/validateTokenHandler");
-const { getChapterImage, createChapterImage, updateChapterImage, deleteChapterImage } = require("../controllers/imageController");
+const { getImage, getChapterImage, createChapterImage, updateChapterImage, deleteChapterImage } = require("../controllers/imageController");
 const fileUploader = require('../config/cloudinary.config');
 
 // router.route("/");
@@ -15,6 +15,7 @@ router.route("/chapter/:id/image")
     .post(validateAdminToken, fileUploader.single('file'), createChapterImage);
 
 router.route("/image/:id")
+    .get(getImage)
     .put(validateAdminToken, fileUploader.single('file'), updateChapterImage)
     .delete(validateAdminToken, deleteChapterImage);
 

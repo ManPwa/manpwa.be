@@ -42,6 +42,17 @@ const getChapterImage = asyncHandler(async (req, res) => {
 });
 
 
+//@desc Get image
+//@rout GET /api/image:id
+//@access public
+const getImage = asyncHandler(async (req, res) => {
+    const image = await Image.findOne({
+        "_id": req.params.id,
+        "_deleted": null
+    });
+    res.status(200).json(image || {}).header({ "Content-Range": "0-20/20" });
+});
+
 //@desc Create chapter image
 //@rout POST /api/chapter/:id/image
 //@access private
@@ -63,10 +74,6 @@ const createChapterImage = asyncHandler(async (req, res) => {
 //@rout PUT /api/image/:id
 //@access private
 const updateChapterImage = asyncHandler(async (req, res) => {
-    if (req.body.chapter_id) {
-        res.status(403);
-        throw new Error("Cannot update chapter id");
-    }
     const image = await Image.findOne({
         "_id": req.params.id,
         "_deleted": null
@@ -74,6 +81,10 @@ const updateChapterImage = asyncHandler(async (req, res) => {
     if (!image) {
         res.status(404);
         throw new Error("Image not found");
+    }
+    if (req.body.chapter_id != image.chapter_id) {
+        res.status(403);
+        throw new Error("Cannot update chapter id");
     }
     if (req.file) {
         image_url = req.file.path;
@@ -114,4 +125,4 @@ const deleteChapterImage = asyncHandler(async (req, res) => {
     });
 });
 
-module.exports = { getChapterImage, createChapterImage, updateChapterImage, deleteChapterImage };
+module.exports = { getImage, getChapterImage, createChapterImage, updateChapterImage, deleteChapterImage };
