@@ -12,7 +12,7 @@ const getUser = asyncHandler(async (req, res) => {
     });
     const user = await User.find({
         "_deleted": null
-    });
+    }).select("-password");
     res.setHeader('Content-Range', `posts : 0-9/${total_user}`).status(200).json(user);
 });
 
