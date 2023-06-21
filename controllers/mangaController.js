@@ -99,6 +99,10 @@ const getManga = asyncHandler(async (req, res) => {
 //@rout POST /api/mangas
 //@access private
 const createManga = asyncHandler(async (req, res) => {
+    if (req.file) {
+        cover_art_url = req.file.path;
+        req.body.cover_art_url = cover_art_url;
+    };
     const created_manga = await Manga.create(req.body);
     res.status(201).json({ 
         message: "Create manga successful", 
@@ -111,7 +115,6 @@ const createManga = asyncHandler(async (req, res) => {
 //@rout PUT /api/mangas/:id
 //@access private
 const updateManga = asyncHandler(async (req, res) => {
-    console.log('AAAA');
     const manga = await Manga.findOne({
         "_id": req.params.id,
         "_deleted": null

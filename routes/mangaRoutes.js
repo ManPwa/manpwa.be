@@ -4,7 +4,7 @@ const { validateToken, validateAdminToken } = require("../middleware/validateTok
 const { getMangas, getManga, createManga, updateManga, deleteManga, followManga, getFollowingManga } = require("../controllers/mangaController");
 const fileUploader = require('../config/cloudinary.config');
 
-router.route("/manga").get(getMangas).post(validateAdminToken, createManga);
+router.route("/manga").get(getMangas).post(validateAdminToken, fileUploader.single('file'), createManga);
 
 router.route("/manga/:id")
     .get(getManga)
