@@ -111,6 +111,7 @@ const createManga = asyncHandler(async (req, res) => {
 //@rout PUT /api/mangas/:id
 //@access private
 const updateManga = asyncHandler(async (req, res) => {
+    console.log('AAAA');
     const manga = await Manga.findOne({
         "_id": req.params.id,
         "_deleted": null
