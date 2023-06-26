@@ -10,6 +10,7 @@ const getMangas = asyncHandler(async (req, res) => {
     const total_manga = await Manga.count({
         "_deleted": null
     });
+    range = [0, 23]
     if (req.query.range) {
         try {
             range = JSON.parse(req.query.range)
