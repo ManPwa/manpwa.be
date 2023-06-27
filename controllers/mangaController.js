@@ -2,6 +2,14 @@ const asyncHandler = require("express-async-handler");
 const Manga = require("../models/mangaModel");
 const MangaView = require("../models/viewMangaModel");
 const Chapter = require("../models/chapterModel");
+var request = require('request');
+
+const getRecommendManga = async (user_id) => {
+    url = 'http://127.0.0.1:5003';
+    const response = await fetch(`${url}/recommendations/manga?user_id=${user_id}`);
+    const myJson = await response.json();
+    return myJson;
+}
 
 //@desc Get all manga
 //@rout GET /api/manga
@@ -11,7 +19,17 @@ const getMangas = asyncHandler(async (req, res) => {
         "_deleted": null
     });
     range = [0, 23]
-    if (req.query.range) {
+    if (req.user) {
+        list_manga_id = await getRecommendManga(req.user._id)
+        manga_list = await Manga.find({
+            "_id": { $in: list_manga_id },
+            "_deleted": null
+        });
+        response = {
+            "total_manga": total_manga,
+            "manga_list": manga_list || []
+        }
+    } else if (req.query.range) {
         try {
             range = JSON.parse(req.query.range)
             match = {

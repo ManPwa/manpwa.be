@@ -51,4 +51,23 @@ const validateAdminToken = asyncHandler(async (req, res, next) => {
     }
 });
 
-module.exports = { validateAdminToken, validateToken };
+const passToken = asyncHandler(async (req, res, next) => {
+    let token;
+    let authHeader = req.headers.Authorization || req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer")) {
+        token = authHeader.split(" ")[1];
+        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+            if (err) {
+                req.user = null;
+                next();
+            }
+            req.user = decoded.user;
+            next();
+        });
+    } else {
+        req.user = null;
+        next();
+    }
+});
+
+module.exports = { validateAdminToken, validateToken, passToken };
