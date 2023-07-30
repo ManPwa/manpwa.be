@@ -21,15 +21,19 @@ const getMangas = asyncHandler(async (req, res) => {
     range = [0, 23]
     if (req.user) {
         list_manga_id = await getRecommendManga(req.user._id)
-        manga_list = await Manga.find({
-            "_id": { $in: list_manga_id },
-            "_deleted": null
-        });
-        response = {
-            "total_manga": total_manga,
-            "manga_list": manga_list || []
+        if (list_manga_id.length > 0) {
+            manga_list = await Manga.find({
+                "_id": { $in: list_manga_id },
+                "_deleted": null
+            });
+            response = {
+                "total_manga": total_manga,
+                "manga_list": manga_list || []
+            }
+            return res.setHeader('Content-Range', `posts : ${range[0]}-${range[1]}/${total_manga}`).status(200).json(response);
         }
-    } else if (req.query.range) {
+    }
+    if (req.query.range) {
         try {
             range = JSON.parse(req.query.range)
             match = {
