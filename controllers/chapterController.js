@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Chapter = require("../models/chapterModel");
 const Manga = require("../models/mangaModel");
-const uuid = require("uuid");
+const ReadHistory = require("../models/readHistoryModel");
 //@desc Get all chapter of a manga
 //@rout GET /api/manga/:manga_id/chapter
 //@access public
@@ -18,6 +18,10 @@ const getMangaChapter = asyncHandler(async (req, res) => {
         "_deleted": null,
         "manga_id": req.params.id,
     });
+    user_id = "";
+    if (req.user) {
+        user_id = req.user._id;
+    }
     aggregate = [
         {
             "$match": {
@@ -25,6 +29,29 @@ const getMangaChapter = asyncHandler(async (req, res) => {
                 "manga_id": req.params.id,
             },
         },
+        {
+            $lookup: {
+                from: "read-history",
+                let: { user: user_id, id: "$_id"},
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $eq: ['$user_id', '$$user']},
+                                    { $eq: ['$chapter_id', '$$id']}
+                                ]
+                            }
+                        }
+                    },
+                ],
+                as: "history"
+            }
+        },
+        {
+            $set: {"read": "$history._id"}
+        },
+        { $unset: "history" },
         {
             "$sort": {
                 "chapter": -1,
@@ -116,4 +143,30 @@ const deleteChapter = asyncHandler(async (req, res) => {
     });
 });
 
-module.exports = { getMangaChapter, createChapter, updateChapter, deleteChapter, getChapter };
+
+//@desc Create read-history
+//@rout POST /api/read-history
+//@access public
+const createReadHistory = asyncHandler(async (req, res) => {
+    const read_hisotry = await ReadHistory.findOne({
+        "chapter_id": req.params.id,
+        "user_id": req.user._id
+    });
+    if (read_hisotry) {
+        res.status(201).json({
+            message: "Already read"
+        });
+    } else {
+        const created_read_hisotry = await ReadHistory.create({
+            "chapter_id": req.params.id,
+            "user_id": req.user._id
+        });
+        res.status(201).json({
+            message: "Create read history successful",
+            "history_id": created_read_hisotry._id
+        });
+    }
+});
+
+
+module.exports = { getMangaChapter, createChapter, updateChapter, deleteChapter, getChapter, createReadHistory };
